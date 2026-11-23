@@ -1,0 +1,41 @@
+name: Verificación del ecosistema Iris
+on:
+  push:
+    branches: [serving-iris-mlops]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  despliegue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: serving
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - name: Iniciar MLflow y FastAPI
+        run: |
+          mkdir -p evidencias
+          mkdir -p mlruns
+          docker compose up --build -d --wait --wait-timeout 240 mlflow
+          docker compose run --rm --no-deps -v "$PWD:/work" -v "$PWD/..:/baseline:ro" -e PYTHONPATH=/baseline -w /work api python pruebas/registrar.py
+          docker compose up --build -d --wait --wait-timeout 240
+          docker compose ps | tee evidencias/contenedores.txt
+      - name: Ejecutar inferencias con curl
+        run: |
+          python3 pruebas/verificar.py | tee evidencias/pruebas.txt
+          curl -fsS localhost:5000/health
+          docker compose logs --no-color api > evidencias/consola.txt
+      - name: Capturar las interfaces
+        run: |
+          python3 -m venv /tmp/iris-ui
+          /tmp/iris-ui/bin/pip install playwright
+          /tmp/iris-ui/bin/python pruebas/capturas.py
+      - name: Guardar evidencia
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidencia-serving
+          path: serving/evidencias/

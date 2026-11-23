@@ -1,0 +1,28 @@
+services:
+  mlflow:
+    build: .
+    command: ["mlflow", "server", "--backend-store-uri", "/store", "--artifacts-destination", "/store", "--serve-artifacts", "--host", "0.0.0.0", "--port", "5000", "--workers", "1"]
+    volumes:
+      - ./mlruns:/store
+    ports:
+      - "127.0.0.1:5000:5000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health', timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 30
+  api:
+    build: .
+    environment:
+      RUN_ID: ${RUN_ID:-bbccf345d70546daa272c5fb8a2fc031}
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+    depends_on:
+      mlflow:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 30

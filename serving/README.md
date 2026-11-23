@@ -1,0 +1,1 @@
+Verificación de Docker Compose con el conjunto público Iris. El flujo serving.yml crea un experimento independiente, registra su versión y valida las inferencias. Consulte los pasos y los comandos en .github/workflows/serving.yml.
