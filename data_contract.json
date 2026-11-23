@@ -1,0 +1,56 @@
+{
+  "version": "1.0",
+  "type": "object",
+  "required": [
+    "sepal_length",
+    "sepal_width",
+    "petal_length",
+    "petal_width"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "sepal_length": {
+      "type": "number",
+      "minimum": 4.3,
+      "maximum": 7.9,
+      "unidad": "cm"
+    },
+    "sepal_width": {
+      "type": "number",
+      "minimum": 2,
+      "maximum": 4.4,
+      "unidad": "cm"
+    },
+    "petal_length": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 6.9,
+      "unidad": "cm"
+    },
+    "petal_width": {
+      "type": "number",
+      "minimum": 0.1,
+      "maximum": 2.5,
+      "unidad": "cm"
+    }
+  },
+  "clases": [
+    "setosa",
+    "versicolor",
+    "virginica"
+  ],
+  "ejemplos": {
+    "valida": {
+      "sepal_length": 5.1,
+      "sepal_width": 3.5,
+      "petal_length": 1.4,
+      "petal_width": 0.2
+    },
+    "invalida": {
+      "sepal_length": "cinco",
+      "sepal_width": null,
+      "petal_length": 1.4,
+      "petal_width": -1
+    }
+  }
+}
